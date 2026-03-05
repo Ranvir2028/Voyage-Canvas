@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plan Your Trip — Voyage Canvas</title>
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/planner.css" />
+</head>
+<body>
+
+<div class="planner-bg"></div>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-logo">VOYAGE <span>CANVAS</span></div>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/planner" class="active">Plan Trip</a></li>
+    <li><a href="/explore">Explore</a></li>
+    <li><a href="/itinerary">My Itinerary</a></li>
+  </ul>
+  <a href="/explore" class="btn btn-ghost btn-sm">Explore First</a>
+</nav>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div style="font-size:3rem; animation: pulse 1s ease infinite;">✈️</div>
+  <div class="loading-spinner"></div>
+  <p class="loading-text" id="loadingText">Crafting your perfect journey...</p>
+  <p class="loading-subtext" id="loadingSubtext">Consulting the AI travel oracle</p>
+</div>
+
+<main class="planner-page page-enter">
+  <div class="container">
+
+    <!-- Header -->
+    <div class="planner-header">
+      <span class="label">Step-by-Step Planner</span>
+      <h1>Design Your <em style="font-style:italic; color:var(--gold)">Journey</em></h1>
+      <p>Fill in your travel details and let AI build the perfect itinerary for you</p>
+    </div>
+
+    <!-- Progress Steps -->
+    <div class="progress-steps" id="progressSteps">
+      <div class="progress-step active" data-step="1">
+        <div class="progress-step-circle">1</div>
+        <div class="progress-step-label">Destination</div>
+      </div>
+      <div class="progress-connector" id="conn-1"></div>
+      <div class="progress-step" data-step="2">
+        <div class="progress-step-circle">2</div>
+        <div class="progress-step-label">Budget</div>
+      </div>
+      <div class="progress-connector" id="conn-2"></div>
+      <div class="progress-step" data-step="3">
+        <div class="progress-step-circle">3</div>
+        <div class="progress-step-label">Preferences</div>
+      </div>
+      <div class="progress-connector" id="conn-3"></div>
+      <div class="progress-step" data-step="4">
+        <div class="progress-step-circle">✦</div>
+        <div class="progress-step-label">Generate</div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="form-container">
+
+      <!-- ── STEP 1: Destination ── -->
+      <div class="form-step active" id="step-1">
+        <div class="form-card">
+          <p class="form-step-title">Where are you headed?</p>
+          <p class="form-step-desc">Tell us your destination and travel dates</p>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Destination *</label>
+              <input type="text" class="form-input" id="destination"
+                placeholder="e.g. Paris, Tokyo, New York…" autocomplete="off" />
+            </div>
+          </div>
+
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label class="form-label">Departure Date *</label>
+              <input type="date" class="form-input" id="startDate" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Return Date *</label>
+              <input type="date" class="form-input" id="endDate" />
+            </div>
+          </div>
+
+          <div class="form-row cols-2">
+            <div class="form-group">
+              <label class="form-label">Trip Duration</label>
+              <input type="text" class="form-input" id="durationDisplay"
+                readonly placeholder="Auto-calculated" style="cursor:default; opacity:0.7;" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Accommodation Type</label>
+              <select class="form-select" id="accommodation">
+                <option value="Budget Hostel">Budget Hostel</option>
+                <option value="Mid-range Hotel" selected>Mid-range Hotel</option>
+                <option value="Boutique Hotel">Boutique Hotel</option>
+                <option value="Luxury Resort">Luxury Resort</option>
+                <option value="Airbnb / Apartment">Airbnb / Apartment</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-nav">
+            <span></span>
+            <button class="btn btn-primary" onclick="nextStep(1)">
+              Continue &nbsp;→
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 2: Budget ── -->
+      <div class="form-step" id="step-2">
+        <div class="form-card">
+          <p class="form-step-title">What's your budget?</p>
+          <p class="form-step-desc">We'll allocate it smartly across accommodation, food, activities, and more</p>
+
+          <div class="budget-display">
+            <div class="budget-value" id="budgetDisplay">$1,000</div>
+            <div class="budget-currency-toggle">
+              <button class="currency-btn active" id="usdBtn" onclick="setCurrency('USD')">$ USD</button>
+              <button class="currency-btn" id="inrBtn" onclick="setCurrency('INR')">₹ INR</button>
+            </div>
+          </div>
+
+          <input type="range" class="budget-slider" id="budgetSlider"
+            min="100" max="10000" value="1000" step="50"
+            oninput="updateBudget(this.value)" />
+
+          <div class="budget-range-labels">
+            <span id="budgetMin">$100</span>
+            <span id="budgetMax">$10,000</span>
+          </div>
+
+          <div class="divider"><div class="divider-diamond"></div></div>
+
+          <div class="form-row cols-3">
+            <div class="form-group" style="text-align:center; background:var(--glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.2rem;">
+              <div style="font-size:0.7rem; color:var(--gold); letter-spacing:2px; text-transform:uppercase; margin-bottom:0.4rem;">Accommodation</div>
+              <div style="font-size:1.1rem; color:var(--cream); font-weight:500;" id="allocAccom">~$350</div>
+              <div style="font-size:0.7rem; color:var(--muted);">35%</div>
+            </div>
+            <div class="form-group" style="text-align:center; background:var(--glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.2rem;">
+              <div style="font-size:0.7rem; color:var(--gold); letter-spacing:2px; text-transform:uppercase; margin-bottom:0.4rem;">Food & Dining</div>
+              <div style="font-size:1.1rem; color:var(--cream); font-weight:500;" id="allocFood">~$250</div>
+              <div style="font-size:0.7rem; color:var(--muted);">25%</div>
+            </div>
+            <div class="form-group" style="text-align:center; background:var(--glass); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.2rem;">
+              <div style="font-size:0.7rem; color:var(--gold); letter-spacing:2px; text-transform:uppercase; margin-bottom:0.4rem;">Activities</div>
+              <div style="font-size:1.1rem; color:var(--cream); font-weight:500;" id="allocAct">~$200</div>
+              <div style="font-size:0.7rem; color:var(--muted);">20%</div>
+            </div>
+          </div>
+
+          <div class="form-nav">
+            <button class="btn btn-ghost" onclick="prevStep(2)">← Back</button>
+            <button class="btn btn-primary" onclick="nextStep(2)">Continue &nbsp;→</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 3: Preferences ── -->
+      <div class="form-step" id="step-3">
+        <div class="form-card">
+          <p class="form-step-title">What's your travel style?</p>
+          <p class="form-step-desc">Select your interests and group type for a personalized plan</p>
+
+          <div class="form-group" style="margin-bottom:2rem;">
+            <label class="form-label" style="margin-bottom:1rem; display:block;">Your Interests (select all that apply)</label>
+            <div class="interest-grid">
+              <div class="interest-tag" data-interest="Culture & History" onclick="toggleInterest(this)">
+                <span class="tag-icon">🏛️</span>
+                <span class="tag-name">Culture</span>
+              </div>
+              <div class="interest-tag" data-interest="Food & Cuisine" onclick="toggleInterest(this)">
+                <span class="tag-icon">🍜</span>
+                <span class="tag-name">Food</span>
+              </div>
+              <div class="interest-tag" data-interest="Adventure & Outdoors" onclick="toggleInterest(this)">
+                <span class="tag-icon">🧗</span>
+                <span class="tag-name">Adventure</span>
+              </div>
+              <div class="interest-tag" data-interest="Nature & Wildlife" onclick="toggleInterest(this)">
+                <span class="tag-icon">🌿</span>
+                <span class="tag-name">Nature</span>
+              </div>
+              <div class="interest-tag" data-interest="Shopping" onclick="toggleInterest(this)">
+                <span class="tag-icon">🛍️</span>
+                <span class="tag-name">Shopping</span>
+              </div>
+              <div class="interest-tag" data-interest="Nightlife & Entertainment" onclick="toggleInterest(this)">
+                <span class="tag-icon">🎭</span>
+                <span class="tag-name">Nightlife</span>
+              </div>
+              <div class="interest-tag" data-interest="Art & Museums" onclick="toggleInterest(this)">
+                <span class="tag-icon">🎨</span>
+                <span class="tag-name">Art</span>
+              </div>
+              <div class="interest-tag" data-interest="Beaches & Relaxation" onclick="toggleInterest(this)">
+                <span class="tag-icon">🏖️</span>
+                <span class="tag-name">Beaches</span>
+              </div>
+              <div class="interest-tag" data-interest="Photography & Sightseeing" onclick="toggleInterest(this)">
+                <span class="tag-icon">📸</span>
+                <span class="tag-name">Photography</span>
+              </div>
+              <div class="interest-tag" data-interest="Wellness & Spa" onclick="toggleInterest(this)">
+                <span class="tag-icon">🧘</span>
+                <span class="tag-name">Wellness</span>
+              </div>
+              <div class="interest-tag" data-interest="Sports & Activities" onclick="toggleInterest(this)">
+                <span class="tag-icon">⚽</span>
+                <span class="tag-name">Sports</span>
+              </div>
+              <div class="interest-tag" data-interest="Local Experiences" onclick="toggleInterest(this)">
+                <span class="tag-icon">🤝</span>
+                <span class="tag-name">Local Life</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:2rem;">
+            <label class="form-label" style="margin-bottom:1rem; display:block;">Who's Traveling?</label>
+            <div class="group-grid">
+              <div class="group-card selected" data-group="Solo" onclick="selectGroup(this)">
+                <span class="group-icon">🧳</span>
+                <div class="group-name">Solo</div>
+              </div>
+              <div class="group-card" data-group="Couple" onclick="selectGroup(this)">
+                <span class="group-icon">💑</span>
+                <div class="group-name">Couple</div>
+              </div>
+              <div class="group-card" data-group="Family" onclick="selectGroup(this)">
+                <span class="group-icon">👨‍👩‍👧</span>
+                <div class="group-name">Family</div>
+              </div>
+              <div class="group-card" data-group="Friends" onclick="selectGroup(this)">
+                <span class="group-icon">👯</span>
+                <div class="group-name">Friends</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" style="margin-bottom:1rem; display:block;">Number of Travelers</label>
+            <div class="travelers-counter">
+              <button class="counter-btn" onclick="adjustTravelers(-1)">−</button>
+              <span class="counter-value" id="travelerCount">1</span>
+              <button class="counter-btn" onclick="adjustTravelers(1)">+</button>
+              <span style="color:var(--muted); font-size:0.85rem;">traveler(s)</span>
+            </div>
+          </div>
+
+          <div class="form-nav">
+            <button class="btn btn-ghost" onclick="prevStep(3)">← Back</button>
+            <button class="btn btn-primary" onclick="nextStep(3)">Review &nbsp;→</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── STEP 4: Summary & Generate ── -->
+      <div class="form-step" id="step-4">
+        <div class="form-card">
+          <p class="form-step-title">Ready to Generate?</p>
+          <p class="form-step-desc">Review your trip details before the AI crafts your itinerary</p>
+
+          <div class="summary-grid" id="summaryGrid">
+            <!-- Filled by JS -->
+          </div>
+
+          <div id="summaryInterests" style="margin-bottom:2rem;">
+            <div class="form-label" style="margin-bottom:0.8rem;">Your Interests</div>
+            <div class="selected-interests-preview" id="interestPills"></div>
+          </div>
+
+          <div class="divider"><div class="divider-diamond"></div></div>
+
+          <div style="background:rgba(201,168,76,0.06); border:1px solid var(--border); border-radius:var(--radius-md); padding:1.5rem; margin-bottom:2rem;">
+            <div style="font-size:0.75rem; color:var(--gold); letter-spacing:2px; text-transform:uppercase; margin-bottom:0.5rem;">✦ What AI will generate</div>
+            <p style="font-size:0.85rem; color:var(--muted); line-height:1.8;">
+              A complete day-by-day itinerary with morning, afternoon, and evening activities · Restaurant recommendations · Accommodation suggestions · Budget breakdown · Packing list · Local tips & more
+            </p>
+          </div>
+
+          <div class="form-nav">
+            <button class="btn btn-ghost" onclick="prevStep(4)">← Edit</button>
+            <button class="btn btn-primary btn-lg" onclick="generateItinerary()">
+              ✦ &nbsp;Generate My Itinerary
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /form-container -->
+  </div><!-- /container -->
+</main>
+
+<script src="/js/main.js"></script>
+<script src="/js/planner.js"></script>
+</body>
+</html>

@@ -1,0 +1,391 @@
+/* =====================================================
+   VOYAGE CANVAS — Landing Page Styles
+   ===================================================== */
+
+/* ── Hero Section ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding-top: 80px;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-gradient {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201, 168, 76, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 50%, rgba(13, 21, 38, 0.9) 0%, transparent 70%),
+    linear-gradient(180deg, var(--midnight) 0%, var(--navy) 50%, var(--midnight) 100%);
+}
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 900px;
+  padding: 0 2rem;
+}
+
+.hero-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  animation: fadeUp 0.8s ease both;
+}
+
+.hero-eyebrow-line {
+  width: 40px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.hero-title {
+  font-size: clamp(3.5rem, 9vw, 7.5rem);
+  font-weight: 300;
+  line-height: 0.95;
+  margin-bottom: 1rem;
+  animation: fadeUp 0.8s ease 0.1s both;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--gold);
+  display: block;
+}
+
+.hero-subtitle {
+  font-family: var(--font-stamp);
+  font-size: clamp(1rem, 2.5vw, 1.6rem);
+  letter-spacing: 6px;
+  color: var(--muted);
+  margin-bottom: 2.5rem;
+  animation: fadeUp 0.8s ease 0.2s both;
+}
+
+.hero-description {
+  font-size: 1.05rem;
+  color: var(--muted);
+  max-width: 520px;
+  margin: 0 auto 3rem;
+  line-height: 1.8;
+  animation: fadeUp 0.8s ease 0.3s both;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeUp 0.8s ease 0.4s both;
+}
+
+/* ── Floating Destination Cards ── */
+.floating-cards {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.float-card {
+  position: absolute;
+  background: rgba(13, 21, 38, 0.8);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.8rem 1.2rem;
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  animation: floatAnim var(--dur) ease-in-out infinite var(--delay);
+}
+
+.float-card .fc-icon { font-size: 1.2rem; }
+.float-card .fc-name { color: var(--cream); font-weight: 500; }
+.float-card .fc-tag  { color: var(--gold); font-size: 0.7rem; }
+
+.float-card:nth-child(1) { top: 18%; left: 8%;  --dur: 6s; --delay: 0s;   }
+.float-card:nth-child(2) { top: 35%; right: 6%; --dur: 7s; --delay: 1s;   }
+.float-card:nth-child(3) { bottom: 30%; left: 5%;  --dur: 8s; --delay: 2s; }
+.float-card:nth-child(4) { top: 60%; right: 8%; --dur: 6.5s; --delay: 0.5s; }
+.float-card:nth-child(5) { top: 22%; right: 22%; --dur: 7.5s; --delay: 1.5s; }
+
+@keyframes floatAnim {
+  0%, 100% { transform: translateY(0px) rotate(-1deg); }
+  50%       { transform: translateY(-18px) rotate(1deg); }
+}
+
+/* ── Stats Bar ── */
+.stats-bar {
+  position: relative;
+  z-index: 2;
+  background: var(--navy);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 2rem 0;
+}
+
+.stats-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4rem;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  text-align: center;
+  animation: fadeUp 0.6s ease both;
+}
+
+.stat-number {
+  font-family: var(--font-stamp);
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 0.3rem;
+}
+
+.stat-divider {
+  width: 1px;
+  height: 40px;
+  background: var(--border);
+}
+
+/* ── How It Works ── */
+.how-it-works {
+  padding: 8rem 0;
+  position: relative;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.section-header h2 {
+  margin: 1rem 0;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  position: relative;
+}
+
+.steps-grid::before {
+  content: '';
+  position: absolute;
+  top: 2.5rem;
+  left: 12%;
+  right: 12%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), var(--gold), var(--border), transparent);
+  z-index: 0;
+}
+
+.step-card {
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  padding: 2rem 1.5rem;
+  animation: fadeUp 0.6s ease both;
+}
+
+.step-number {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--navy);
+  border: 1px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
+  font-family: var(--font-stamp);
+  font-size: 1.3rem;
+  color: var(--gold);
+  position: relative;
+  transition: var(--transition);
+}
+
+.step-card:hover .step-number {
+  background: var(--gold);
+  color: var(--midnight);
+  box-shadow: 0 0 30px rgba(201, 168, 76, 0.4);
+}
+
+.step-icon {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.step-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.8rem;
+}
+
+/* ── Features Section ── */
+.features {
+  padding: 6rem 0;
+  background: var(--navy);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.feature-card {
+  padding: 2rem;
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  transform: scaleX(0);
+  transition: transform 0.4s ease;
+}
+
+.feature-card:hover {
+  background: var(--glass-hover);
+  border-color: rgba(201, 168, 76, 0.3);
+  transform: translateY(-4px);
+}
+
+.feature-card:hover::before {
+  transform: scaleX(1);
+}
+
+.feature-icon {
+  font-size: 2rem;
+  margin-bottom: 1.2rem;
+  display: block;
+}
+
+.feature-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.8rem;
+  color: var(--cream);
+}
+
+/* ── CTA Section ── */
+.cta-section {
+  padding: 8rem 0;
+  text-align: center;
+  position: relative;
+}
+
+.cta-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 300px;
+  background: radial-gradient(ellipse, rgba(201,168,76,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.cta-section h2 {
+  margin: 1rem 0 1.5rem;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+}
+
+/* ── Footer ── */
+.footer {
+  background: var(--navy);
+  border-top: 1px solid var(--border);
+  padding: 3rem 0 2rem;
+  text-align: center;
+}
+
+.footer-logo {
+  font-family: var(--font-stamp);
+  font-size: 1.8rem;
+  letter-spacing: 4px;
+  color: var(--gold);
+  margin-bottom: 1rem;
+}
+
+.footer-tagline {
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  margin-bottom: 2rem;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  list-style: none;
+  margin-bottom: 2rem;
+}
+
+.footer-links a {
+  color: var(--muted);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: color 0.3s;
+}
+
+.footer-links a:hover { color: var(--gold); }
+
+.footer-copy {
+  color: rgba(136, 150, 168, 0.5);
+  font-size: 0.75rem;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

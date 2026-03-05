@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Itinerary — Voyage Canvas</title>
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/itinerary.css" />
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-logo">VOYAGE <span>CANVAS</span></div>
+  <ul class="nav-links">
+    <li><a href="/">Home</a></li>
+    <li><a href="/planner">Plan Trip</a></li>
+    <li><a href="/explore">Explore</a></li>
+    <li><a href="/itinerary" class="active">My Itinerary</a></li>
+  </ul>
+  <a href="/planner" class="btn btn-outline btn-sm">New Trip</a>
+</nav>
+
+<!-- No Itinerary State -->
+<div id="noItineraryState" style="display:none; min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:2rem;">
+  <div style="font-size:5rem; margin-bottom:2rem;">✈️</div>
+  <h2 style="margin-bottom:1rem;">No Itinerary Yet</h2>
+  <p style="color:var(--muted); margin-bottom:2rem; max-width:400px;">
+    You haven't generated an itinerary yet. Head over to the planner to design your perfect journey.
+  </p>
+  <a href="/planner" class="btn btn-primary btn-lg">✦ &nbsp;Start Planning</a>
+</div>
+
+<!-- Itinerary Content (shown when data exists) -->
+<main class="itinerary-page page-enter" id="itineraryContent" style="display:none;">
+
+  <!-- Trip Banner -->
+  <div class="trip-banner">
+    <div class="container">
+      <div class="trip-banner-inner">
+        <div class="trip-title-block">
+          <span class="label" id="itinLabel">Your Personalized Journey</span>
+          <h1 id="itinTitle">Loading...</h1>
+          <div class="trip-meta">
+            <div class="trip-meta-item">
+              <span>📍</span> <span id="itinDestination">—</span>
+            </div>
+            <div class="trip-meta-item">
+              <span>📅</span> <span id="itinDates">—</span>
+            </div>
+            <div class="trip-meta-item">
+              <span>⏱️</span> <span id="itinDuration">—</span>
+            </div>
+            <div class="trip-meta-item">
+              <span>💰</span> <span id="itinBudget">—</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:1rem; align-items:flex-end;">
+          <!-- Weather Widget -->
+          <div class="weather-widget" id="weatherWidget">
+            <div class="weather-icon">🌤️</div>
+            <div class="weather-info">
+              <div class="weather-temp" id="weatherTemp">—°C</div>
+              <div class="weather-desc" id="weatherDesc">Loading weather...</div>
+              <div class="weather-extras" id="weatherExtras"></div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="trip-actions">
+            <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨️ Print</button>
+            <button class="btn btn-ghost btn-sm" onclick="exportPDF()">📄 Export PDF</button>
+            <button class="btn btn-outline btn-sm" onclick="location.href='/planner'">✦ Regenerate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="itinerary-layout">
+
+      <!-- ── Sidebar ── -->
+      <aside class="itinerary-sidebar">
+
+        <!-- Day Navigator -->
+        <div class="sidebar-card">
+          <h4>🗓️ Days</h4>
+          <ul class="day-nav-list" id="dayNavList">
+            <!-- Filled by JS -->
+          </ul>
+        </div>
+
+        <!-- Budget Breakdown -->
+        <div class="sidebar-card">
+          <h4>💰 Budget Breakdown</h4>
+          <div class="budget-bars" id="budgetBars">
+            <!-- Filled by JS -->
+          </div>
+          <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border); display:flex; justify-content:space-between;">
+            <span style="font-size:0.78rem; color:var(--muted);">Total Estimated</span>
+            <span style="font-size:0.9rem; color:var(--gold); font-weight:600;" id="totalBudgetDisplay">—</span>
+          </div>
+        </div>
+
+        <!-- Map -->
+        <div class="sidebar-card" style="padding:0; overflow:hidden;">
+          <div class="map-container">
+            <iframe id="mapFrame"
+              src="https://maps.google.com/maps?q=Paris&output=embed&z=11"
+              allowfullscreen loading="lazy">
+            </iframe>
+          </div>
+          <div style="padding:0.8rem 1rem;">
+            <p style="font-size:0.72rem; color:var(--muted); text-align:center;">
+              📍 <span id="mapLabel">Destination Map</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Packing List -->
+        <div class="sidebar-card">
+          <h4>🧳 Packing List</h4>
+          <div class="packing-grid" id="packingGrid">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- ── Main Content ── -->
+      <div class="itinerary-main" id="itineraryMain">
+
+        <!-- Overview Card -->
+        <div class="overview-card" id="overviewCard">
+          <div class="overview-text">
+            <span class="label" style="margin-bottom:0.8rem; display:block;">Trip Overview</span>
+            <p id="overviewText"></p>
+            <p style="font-size:0.82rem; color:var(--muted);">
+              <strong style="color:var(--gold);">Best Time to Visit:</strong>
+              <span id="bestTime"></span>
+            </p>
+          </div>
+          <div>
+            <span class="label" style="margin-bottom:0.8rem; display:block;">Local Tips</span>
+            <ul class="tips-list" id="localTips"></ul>
+          </div>
+        </div>
+
+        <!-- Day Cards (filled by JS) -->
+        <div id="dayCards"></div>
+
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script src="/js/main.js"></script>
+<script src="/js/itinerary.js"></script>
+</body>
+</html>
