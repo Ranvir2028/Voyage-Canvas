@@ -4,18 +4,35 @@
 
 import sys, os, json, re
 import settings
-from google import genai
+import google.generativeai as genai
 
-client = genai.Client(api_key=settings.GEMINI_API_KEY)
+# Use the OLD SDK which has better free tier support
+genai.configure(api_key=settings.GEMINI_API_KEY)
+
+def _get_model():
+    """Try models in order until one works."""
+    models_to_try = [
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+        "gemini-2.0-flash-exp",
+        "gemini-2.0-flash",
+    ]
+    for model_name in models_to_try:
+        try:
+            m = genai.GenerativeModel(model_name)
+            # Quick test
+            m.generate_content("Hi")
+            print(f"   Using model: {model_name}")
+            return m
+        except Exception as e:
+            print(f"   Model {model_name} failed: {e}")
+            continue
+    raise Exception("No working Gemini model found. Check your API key.")
 
 def _call_gemini(prompt: str) -> str:
-    """Single helper to call Gemini and return clean text."""
-    response = client.models.generate_content(
-        model=settings.GEMINI_MODEL,
-        contents=prompt
-    )
+    model = genai.GenerativeModel(settings.GEMINI_MODEL)
+    response = model.generate_content(prompt)
     raw = response.text.strip()
-    # Strip markdown fences if present
     raw = re.sub(r'^```json\s*', '', raw, flags=re.MULTILINE)
     raw = re.sub(r'^```\s*', '', raw, flags=re.MULTILINE)
     raw = re.sub(r'\s*```$', '', raw, flags=re.MULTILINE)
@@ -106,8 +123,7 @@ Return ONLY a valid JSON object (no markdown, no code blocks, no extra text) wit
   "localCuisine": ["dish1", "dish2", "dish3"]
 }}
 
-Generate EXACTLY {days} day objects in the days array.
-Make it genuinely helpful, specific to {destination}, and realistic for a {group_type} traveler with a {currency_sym}{budget} budget.
+Generate EXACTLY {days} day objects. Be specific to {destination} and realistic for {currency_sym}{budget} budget.
 """
     raw = _call_gemini(prompt)
     return json.loads(raw)
