@@ -15,10 +15,11 @@
 <nav class="nav">
   <div class="nav-logo">VOYAGE <span>CANVAS</span></div>
   <ul class="nav-links">
-    <li><a href="/">Home</a></li>
+    <li><a href="/home">Home</a></li>
     <li><a href="/planner" class="active">Plan Trip</a></li>
     <li><a href="/explore">Explore</a></li>
     <li><a href="/itinerary">My Itinerary</a></li>
+    <li><a href="/dashboard">Dashboard</a></li>
   </ul>
   <a href="/explore" class="btn btn-ghost btn-sm">Explore First</a>
 </nav>
@@ -70,7 +71,13 @@
       <!-- ── STEP 1: Destination ── -->
       <div class="form-step active" id="step-1">
         <div class="form-card">
-          <p class="form-step-title">Where are you headed?</p>
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem; margin-bottom:0.5rem;">
+            <p class="form-step-title" style="margin:0;">Where are you headed?</p>
+            <button class="btn btn-ghost btn-sm" type="button" onclick="surpriseMe()" 
+              style="border-color:var(--gold); color:var(--gold);">
+              🎲 &nbsp;Surprise Me
+            </button>
+          </div>
           <p class="form-step-desc">Tell us your destination and travel dates</p>
 
           <div class="form-row">
@@ -99,14 +106,52 @@
                 readonly placeholder="Auto-calculated" style="cursor:default; opacity:0.7;" />
             </div>
             <div class="form-group">
-              <label class="form-label">Accommodation Type</label>
-              <select class="form-select" id="accommodation">
-                <option value="Budget Hostel">Budget Hostel</option>
-                <option value="Mid-range Hotel" selected>Mid-range Hotel</option>
-                <option value="Boutique Hotel">Boutique Hotel</option>
-                <option value="Luxury Resort">Luxury Resort</option>
-                <option value="Airbnb / Apartment">Airbnb / Apartment</option>
-              </select>
+              <label class="form-label">Accommodation Rating</label>
+              <div class="star-rating-select" id="starRatingSelect">
+                <div class="star-option" data-value="1-star" data-label="1 Star — Basic / Dormitory" onclick="selectStarRating(this)">
+                  <span class="stars">⭐</span>
+                  <div class="star-option-text">
+                    <div class="star-option-name">1 Star</div>
+                    <div class="star-option-desc">Basic / Dormitory / Backpacker</div>
+                  </div>
+                </div>
+                <div class="star-option" data-value="2-star" data-label="2 Star — Budget Hotel" onclick="selectStarRating(this)">
+                  <span class="stars">⭐⭐</span>
+                  <div class="star-option-text">
+                    <div class="star-option-name">2 Star</div>
+                    <div class="star-option-desc">Budget Hotel / Guesthouse</div>
+                  </div>
+                </div>
+                <div class="star-option selected" data-value="3-star" data-label="3 Star — Mid-range Hotel" onclick="selectStarRating(this)">
+                  <span class="stars">⭐⭐⭐</span>
+                  <div class="star-option-text">
+                    <div class="star-option-name">3 Star</div>
+                    <div class="star-option-desc">Mid-range Hotel / Comfortable</div>
+                  </div>
+                </div>
+                <div class="star-option" data-value="4-star" data-label="4 Star — Superior Hotel" onclick="selectStarRating(this)">
+                  <span class="stars">⭐⭐⭐⭐</span>
+                  <div class="star-option-text">
+                    <div class="star-option-name">4 Star</div>
+                    <div class="star-option-desc">Superior Hotel / Boutique</div>
+                  </div>
+                </div>
+                <div class="star-option" data-value="5-star" data-label="5 Star — Luxury Resort" onclick="selectStarRating(this)">
+                  <span class="stars">⭐⭐⭐⭐⭐</span>
+                  <div class="star-option-text">
+                    <div class="star-option-name">5 Star</div>
+                    <div class="star-option-desc">Luxury Resort / Premium</div>
+                  </div>
+                </div>
+                <div class="star-option" data-value="airbnb" data-label="Airbnb / Apartment" onclick="selectStarRating(this)">
+                  <span class="stars">🏠</span>
+                  <div class="star-option-text">
+                    <div class="star-option-name">Airbnb</div>
+                    <div class="star-option-desc">Private Apartment / Home Stay</div>
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" id="accommodation" value="3-star" />
             </div>
           </div>
 
@@ -305,7 +350,9 @@
   </div><!-- /container -->
 </main>
 
+<script src="/js/auth.js"></script>
 <script src="/js/main.js"></script>
 <script src="/js/planner.js"></script>
+<script>requireAuth();</script>
 </body>
 </html>

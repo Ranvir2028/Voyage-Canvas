@@ -13,10 +13,11 @@
 <nav class="nav">
   <div class="nav-logo">VOYAGE <span>CANVAS</span></div>
   <ul class="nav-links">
-    <li><a href="/">Home</a></li>
+    <li><a href="/home">Home</a></li>
     <li><a href="/planner">Plan Trip</a></li>
     <li><a href="/explore">Explore</a></li>
     <li><a href="/itinerary" class="active">My Itinerary</a></li>
+    <li><a href="/dashboard">Dashboard</a></li>
   </ul>
   <a href="/planner" class="btn btn-outline btn-sm">New Trip</a>
 </nav>
@@ -96,9 +97,17 @@
         <!-- Budget Breakdown -->
         <div class="sidebar-card">
           <h4>💰 Budget Breakdown</h4>
-          <div class="budget-bars" id="budgetBars">
-            <!-- Filled by JS -->
+          <!-- Pie Chart -->
+          <div class="budget-chart-container">
+            <canvas id="budgetPieChart" width="200" height="200"></canvas>
+            <div class="chart-center-label">
+              <span class="chart-total" id="chartTotal">—</span>
+              <span class="chart-label">Total</span>
+            </div>
           </div>
+          <!-- Currency trio -->
+          <div class="currency-trio" id="currencyTrio" style="margin-bottom:1rem;"></div>
+          <div class="budget-bars" id="budgetBars"></div>
           <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border); display:flex; justify-content:space-between;">
             <span style="font-size:0.78rem; color:var(--muted);">Total Estimated</span>
             <span style="font-size:0.9rem; color:var(--gold); font-weight:600;" id="totalBudgetDisplay">—</span>
@@ -158,7 +167,9 @@
 
 </main>
 
+<script src="/js/auth.js"></script>
 <script src="/js/main.js"></script>
 <script src="/js/itinerary.js"></script>
+<script>requireAuth();</script>
 </body>
 </html>

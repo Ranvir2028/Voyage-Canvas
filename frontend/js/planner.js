@@ -273,11 +273,16 @@ async function generateItinerary() {
   saveTripData(tripData);
 
   const loadingMessages = [
-    "Researching your destination...",
-    "Crafting the perfect itinerary...",
-    "Selecting top attractions...",
-    "Optimizing your schedule...",
-    "Almost ready...",
+    "✈️  Bribing local tour guides...",
+    "🗺️  Charting the perfect route...",
+    "🍜  Taste-testing local cuisine (virtually)...",
+    "📸  Scouting the best photography spots...",
+    "🏨  Negotiating hotel prices...",
+    "🌤️  Checking the weather forecast...",
+    "💰  Optimizing your budget allocation...",
+    "🎯  Finding hidden gems off the beaten path...",
+    "🧳  Packing your virtual suitcase...",
+    "✦  Almost ready — this will be epic...",
   ];
 
   showLoading(loadingMessages[0], "Powered by Google Gemini AI");
@@ -311,3 +316,183 @@ async function generateItinerary() {
     console.error("Generation error:", err);
   }
 }
+
+// ── Star Rating Selector ──────────────────────────────────────
+function selectStarRating(el) {
+  document
+    .querySelectorAll(".star-option")
+    .forEach((o) => o.classList.remove("selected"));
+  el.classList.add("selected");
+  document.getElementById("accommodation").value = el.dataset.value;
+}
+
+// ── Currency Auto-Detect ──────────────────────────────────────
+let detectedCurrency = null;
+
+async function detectCurrencyForDestination(destination) {
+  if (!destination || destination.length < 2) return;
+  try {
+    const res = await fetch(
+      `/api/currency/detect?destination=${encodeURIComponent(destination)}`,
+    );
+    const data = await res.json();
+    if (data.success && data.currency.detected) {
+      detectedCurrency = data.currency;
+      showCurrencyBadge(data.currency);
+    }
+  } catch (e) {
+    /* silent fail */
+  }
+}
+
+function showCurrencyBadge(currency) {
+  let badge = document.getElementById("currencyBadge");
+  if (!badge) {
+    badge = document.createElement("div");
+    badge.id = "currencyBadge";
+    badge.className = "currency-badge";
+    const destField = document.getElementById("destination").parentElement;
+    destField.appendChild(badge);
+  }
+  badge.innerHTML = `🌍 Local currency detected: <strong>${currency.symbol} ${currency.code}</strong> — ${currency.name}`;
+  badge.style.display = "flex";
+}
+
+// Hook into destination input
+document.addEventListener("DOMContentLoaded", () => {
+  const destInput = document.getElementById("destination");
+  if (destInput) {
+    let debounceTimer;
+    destInput.addEventListener("input", () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        detectCurrencyForDestination(destInput.value.trim());
+      }, 600);
+    });
+  }
+});
+
+// ── Surprise Me Button ────────────────────────────────────────
+const SURPRISE_DESTINATIONS = [
+  {
+    dest: "Kyoto, Japan",
+    interests: ["Culture & History", "Food & Cuisine", "Art & Museums"],
+  },
+  {
+    dest: "Santorini, Greece",
+    interests: [
+      "Beaches & Relaxation",
+      "Photography & Sightseeing",
+      "Food & Cuisine",
+    ],
+  },
+  {
+    dest: "Bali, Indonesia",
+    interests: ["Nature & Wildlife", "Wellness & Spa", "Adventure & Outdoors"],
+  },
+  {
+    dest: "Marrakech, Morocco",
+    interests: ["Culture & History", "Shopping", "Food & Cuisine"],
+  },
+  {
+    dest: "Iceland",
+    interests: [
+      "Adventure & Outdoors",
+      "Photography & Sightseeing",
+      "Nature & Wildlife",
+    ],
+  },
+  {
+    dest: "Tokyo, Japan",
+    interests: ["Food & Cuisine", "Shopping", "Nightlife & Entertainment"],
+  },
+  {
+    dest: "Maldives",
+    interests: [
+      "Beaches & Relaxation",
+      "Wellness & Spa",
+      "Photography & Sightseeing",
+    ],
+  },
+  {
+    dest: "Prague, Czech Republic",
+    interests: [
+      "Culture & History",
+      "Nightlife & Entertainment",
+      "Art & Museums",
+    ],
+  },
+  {
+    dest: "Cape Town, South Africa",
+    interests: ["Adventure & Outdoors", "Nature & Wildlife", "Food & Cuisine"],
+  },
+  {
+    dest: "Rajasthan, India",
+    interests: [
+      "Culture & History",
+      "Photography & Sightseeing",
+      "Local Experiences",
+    ],
+  },
+];
+
+function surpriseMe() {
+  const pick =
+    SURPRISE_DESTINATIONS[
+      Math.floor(Math.random() * SURPRISE_DESTINATIONS.length)
+    ];
+
+  // Fill destination
+  const destInput = document.getElementById("destination");
+  if (destInput) {
+    destInput.value = pick.dest;
+    destInput.style.borderColor = "var(--gold)";
+    detectCurrencyForDestination(pick.dest);
+    setTimeout(() => (destInput.style.borderColor = ""), 1500);
+  }
+
+  // Set dates (2 weeks from now, 5 days)
+  const start = new Date();
+  start.setDate(start.getDate() + 14);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 4);
+
+  const fmt = (d) => d.toISOString().split("T")[0];
+  document.getElementById("startDate").value = fmt(start);
+  document.getElementById("endDate").value = fmt(end);
+
+  const dur = document.getElementById("durationDisplay");
+  if (dur) dur.value = "5 days";
+
+  // Select interests
+  document.querySelectorAll(".interest-tag").forEach((tag) => {
+    const isMatch = pick.interests.includes(tag.dataset.interest);
+    tag.classList.toggle("selected", isMatch);
+  });
+  selectedInterests = [...pick.interests];
+
+  showToast(`✦ Destination chosen: ${pick.dest}`, "success", 3000);
+  // Jump to step 1 if not there
+  if (currentStep !== 1) {
+    showStep(1);
+    updateProgress(currentStep, 1);
+  }
+}
+
+// ── Fun Loading Messages ───────────────────────────────────────
+const FUN_LOADING_MSGS = [
+  "Bribing local tour guides...",
+  "Checking if it's tourist season...",
+  "Negotiating hotel prices...",
+  "Consulting the travel oracle...",
+  "Taste-testing local cuisine (virtually)...",
+  "Finding hidden gems off the beaten path...",
+  "Calculating optimal selfie spots...",
+  "Packing your virtual suitcase...",
+  "Checking visa requirements...",
+  "Almost ready — booking the best table in town...",
+];
+
+// Override the generateItinerary loading messages
+const _origGenerate = generateItinerary;
+// Patch loading messages in generateItinerary (already uses FUN_LOADING_MSGS via override below)

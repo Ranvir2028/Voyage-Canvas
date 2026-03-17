@@ -16,10 +16,11 @@
 <nav class="nav">
   <div class="nav-logo">VOYAGE <span>CANVAS</span></div>
   <ul class="nav-links">
-    <li><a href="/" class="active">Home</a></li>
+    <li><a href="/home" class="active">Home</a></li>
     <li><a href="/planner">Plan Trip</a></li>
     <li><a href="/explore">Explore</a></li>
     <li><a href="/itinerary">My Itinerary</a></li>
+    <li><a href="/dashboard">Dashboard</a></li>
   </ul>
   <a href="/planner" class="btn btn-primary btn-sm">Start Planning</a>
 </nav>
@@ -229,7 +230,7 @@
     <div class="footer-logo">VOYAGE CANVAS</div>
     <p class="footer-tagline">DESIGN YOUR JOURNEY · AI-POWERED TRAVEL PLANNING</p>
     <ul class="footer-links">
-      <li><a href="/">Home</a></li>
+      <li><a href="/home">Home</a></li>
       <li><a href="/planner">Plan Trip</a></li>
       <li><a href="/explore">Explore</a></li>
       <li><a href="/itinerary">Itinerary</a></li>
@@ -238,6 +239,7 @@
   </div>
 </footer>
 
+<script src="/js/auth.js"></script>
 <script src="/js/main.js"></script>
 <script>
   // Stars
@@ -275,5 +277,6 @@
   }, { threshold: 0.5 });
   counters.forEach(c => observer.observe(c));
 </script>
+<script>requireAuth();</script>
 </body>
 </html>

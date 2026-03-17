@@ -4,38 +4,127 @@ __pycache__/
 *$py.class
 *.so
 .Python
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+.python-version
+pip-log.txt
+pip-delete-this-directory.txt
+*.cover
+.hypothesis/
+.tox/
 
 # Virtual Environments
 venv/
 env/
 .venv/
+ENV/
+env.bak/
+venv.bak/
 
 # Package files
 *.egg-info/
 dist/
 build/
+*.egg
+*.whl
+MANIFEST
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*.sublime-*
+.project
+.classpath
+*.iml
 
 # OS
 .DS_Store
 Thumbs.db
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+desktop.ini
 
 # Logs
 *.log
 logs/
+*.log.*
+npm-debug.log*  # If using Node tools with Python
 
 # Database
 *.db
 *.sqlite
+*.sqlite3
+*.sql
+*.mdb
+*.dump
+*.sql.gz
+*.db-journal
 
 # Secrets (CRITICAL - never commit these!)
 .env
+.env.*
 config.ini
+config.local.*
 secrets.json
+*.secret
+*.secrets
+secrets/
+credentials.json
+service-account*.json
+oauth*.json
+*.credentials
 *.key
 *.pem
+*.p12
+*.pfx
+*.cert
+*.crt
+
+# Backup files
+*.bak
+*.backup
+*.old
+*.orig
+*.tmp
+*.temp
+*~
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+*.ipynb_checkpoints/
+
+# VS Code specific Python settings
+.vscode/settings.json
+
+# Coverage reports
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+
+# Sphinx documentation
+docs/_build/
+docs/_static/
+docs/_templates/
+
+# PyBuilder
+target/
+
+# Profiling data
+.prof
+*.prof
+*.stats
+
+# Docker (if you use it)
+.dockerignore
+docker-compose.override.yml
+Dockerfile.dev
+.docker/

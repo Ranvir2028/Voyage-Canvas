@@ -9,8 +9,11 @@ import settings
 from ai_service import generate_itinerary, get_destination_info
 from weather_service import get_weather, get_forecast
 from budget_service import allocate_budget, estimate_trip_cost
+from database import (init_db, create_user, login_user, get_user_by_token,
+                      logout_user, save_itinerary, get_user_itineraries,
+                      get_itinerary_by_id, delete_itinerary, get_user_stats)
 
-# ── Absolute Paths (Windows-safe) ─────────────────────────────
+# ── Absolute Paths ────────────────────────────────────────────
 BACKEND_DIR  = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR     = os.path.dirname(BACKEND_DIR)
 FRONTEND_DIR = os.path.join(ROOT_DIR, 'frontend')
@@ -22,14 +25,36 @@ ASSETS_DIR   = os.path.join(FRONTEND_DIR, 'assets')
 app = Flask(__name__)
 CORS(app, origins=["*"])
 
-# ── Debug: print paths on startup ─────────────────────────────
-print(f"   Frontend : {FRONTEND_DIR}")
-print(f"   Pages    : {PAGES_DIR}")
-print(f"   CSS      : {CSS_DIR}")
-print(f"   JS       : {JS_DIR}")
+# Initialize DB on startup
+init_db()
+
+# ── Auth Helper ───────────────────────────────────────────────
+def get_current_user():
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    if not token:
+        return None
+    return get_user_by_token(token)
+
+def require_auth():
+    user = get_current_user()
+    if not user:
+        return None, jsonify({"error": "Unauthorized"}), 401
+    return user, None, None
 
 # ── Serve Pages ───────────────────────────────────────────────
 @app.route('/')
+def root():
+    return send_from_directory(PAGES_DIR, 'login.html')
+
+@app.route('/login')
+def login_page():
+    return send_from_directory(PAGES_DIR, 'login.html')
+
+@app.route('/dashboard')
+def dashboard():
+    return send_from_directory(PAGES_DIR, 'dashboard.html')
+
+@app.route('/home')
 def index():
     return send_from_directory(PAGES_DIR, 'index.html')
 
@@ -58,12 +83,96 @@ def serve_js(filename):
 def serve_assets(filename):
     return send_from_directory(ASSETS_DIR, filename)
 
-# ── API: Health ───────────────────────────────────────────────
-@app.route("/api/health", methods=["GET"])
-def health():
-    return jsonify({"status": "online", "version": "1.0.0"})
+# ── AUTH ROUTES ───────────────────────────────────────────────
 
-# ── API: Generate Itinerary ───────────────────────────────────
+@app.route('/api/auth/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username  = data.get('username', '').strip()
+    email     = data.get('email', '').strip()
+    password  = data.get('password', '')
+    full_name = data.get('fullName', '').strip()
+    if not all([username, email, password, full_name]):
+        return jsonify({"error": "All fields are required"}), 400
+    if len(password) < 6:
+        return jsonify({"error": "Password must be at least 6 characters"}), 400
+    result = create_user(username, email, password, full_name)
+    if not result['success']:
+        return jsonify({"error": result['error']}), 409
+    # Auto-login after register
+    login_result = login_user(username, password)
+    return jsonify({"success": True, "token": login_result['token'],
+                    "user": _safe_user(login_result['user'])})
+
+@app.route('/api/auth/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    identifier = data.get('username', '').strip()
+    password   = data.get('password', '')
+    if not identifier or not password:
+        return jsonify({"error": "Username and password required"}), 400
+    result = login_user(identifier, password)
+    if not result['success']:
+        return jsonify({"error": result['error']}), 401
+    return jsonify({"success": True, "token": result['token'],
+                    "user": _safe_user(result['user'])})
+
+@app.route('/api/auth/logout', methods=['POST'])
+def logout():
+    token = request.headers.get('Authorization', '').replace('Bearer ', '')
+    if token:
+        logout_user(token)
+    return jsonify({"success": True})
+
+@app.route('/api/auth/me', methods=['GET'])
+def me():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    return jsonify({"success": True, "user": _safe_user(user)})
+
+def _safe_user(user: dict) -> dict:
+    """Return user without password."""
+    return {k: v for k, v in user.items() if k != 'password'}
+
+# ── USER ROUTES ───────────────────────────────────────────────
+
+@app.route('/api/user/stats', methods=['GET'])
+def user_stats():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    stats = get_user_stats(user['id'])
+    return jsonify({"success": True, "stats": stats})
+
+@app.route('/api/user/itineraries', methods=['GET'])
+def user_itineraries():
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    itins = get_user_itineraries(user['id'])
+    return jsonify({"success": True, "itineraries": itins})
+
+@app.route('/api/user/itineraries/<int:itin_id>', methods=['GET'])
+def get_itinerary(itin_id):
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    itin = get_itinerary_by_id(itin_id, user['id'])
+    if not itin:
+        return jsonify({"error": "Not found"}), 404
+    return jsonify({"success": True, "itinerary": itin})
+
+@app.route('/api/user/itineraries/<int:itin_id>', methods=['DELETE'])
+def delete_user_itinerary(itin_id):
+    user = get_current_user()
+    if not user:
+        return jsonify({"error": "Unauthorized"}), 401
+    result = delete_itinerary(itin_id, user['id'])
+    return jsonify(result)
+
+# ── TRIP ROUTES ───────────────────────────────────────────────
+
 @app.route("/api/generate-itinerary", methods=["POST"])
 def generate():
     try:
@@ -71,13 +180,24 @@ def generate():
         if not data or not data.get("destination"):
             return jsonify({"error": "Destination is required"}), 400
         result = generate_itinerary(data)
+        # Auto-save if user is logged in
+        user = get_current_user()
+        if user:
+            save_itinerary(
+                user_id=user['id'],
+                title=result.get('summary', data['destination'])[:60],
+                destination=data['destination'],
+                duration=int(data.get('days', 3)),
+                budget=float(data.get('budget', 0)),
+                currency=data.get('currency', 'USD'),
+                data=json.dumps(result)
+            )
         return jsonify({"success": True, "itinerary": result})
     except json.JSONDecodeError as e:
         return jsonify({"error": f"AI returned invalid JSON: {str(e)}"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ── API: Destination Info ─────────────────────────────────────
 @app.route("/api/destination-info", methods=["GET"])
 def destination_info():
     destination = request.args.get("destination", "")
@@ -89,7 +209,6 @@ def destination_info():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ── API: Weather ──────────────────────────────────────────────
 @app.route("/api/weather", methods=["GET"])
 def weather():
     city = request.args.get("city", "")
@@ -97,9 +216,9 @@ def weather():
         return jsonify({"error": "City required"}), 400
     current  = get_weather(city)
     forecast = get_forecast(city)
-    return jsonify({"success": True, "current": current, "forecast": forecast.get("forecast", [])})
+    return jsonify({"success": True, "current": current,
+                    "forecast": forecast.get("forecast", [])})
 
-# ── API: Budget ───────────────────────────────────────────────
 @app.route("/api/budget", methods=["POST"])
 def budget():
     try:
@@ -115,7 +234,6 @@ def budget():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ── API: Popular Destinations ─────────────────────────────────
 @app.route("/api/popular-destinations", methods=["GET"])
 def popular_destinations():
     destinations = [
@@ -133,6 +251,36 @@ def popular_destinations():
         {"name": "Iceland",   "country": "Iceland",   "emoji": "🌋", "tag": "Adventure", "avgCostUSD": 300, "avgCostINR": 25200},
     ]
     return jsonify({"success": True, "destinations": destinations})
+
+@app.route("/api/health", methods=["GET"])
+def health():
+    return jsonify({"status": "online", "version": "2.0.0"})
+
+
+# ── Currency Routes ───────────────────────────────────────────
+from currency_service import get_currency, convert_to_local, get_all_currencies
+
+@app.route("/api/currency/detect", methods=["GET"])
+def detect_currency():
+    destination = request.args.get("destination", "")
+    if not destination:
+        return jsonify({"error": "Destination required"}), 400
+    currency = get_currency(destination)
+    return jsonify({"success": True, "currency": currency})
+
+@app.route("/api/currency/convert", methods=["GET"])
+def currency_convert():
+    try:
+        amount = float(request.args.get("amount", 0))
+        destination = request.args.get("destination", "")
+        result = convert_to_local(amount, destination)
+        return jsonify({"success": True, "conversion": result})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/currency/list", methods=["GET"])
+def currency_list():
+    return jsonify({"success": True, "currencies": get_all_currencies()})
 
 # ── Run ───────────────────────────────────────────────────────
 if __name__ == "__main__":

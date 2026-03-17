@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Voyage Canvas</title>
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/auth.css" />
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="nav-logo">VOYAGE <span>CANVAS</span></div>
+  <ul class="nav-links">
+    <li><a href="/home">Home</a></li>
+    <li><a href="/planner">Plan Trip</a></li>
+    <li><a href="/explore">Explore</a></li>
+    <li><a href="/dashboard" class="active">Dashboard</a></li>
+  </ul>
+  <button class="btn btn-ghost btn-sm" onclick="logout()">Sign Out</button>
+</nav>
+
+<main class="dashboard-page page-enter">
+
+  <!-- Dashboard Header -->
+  <div class="dashboard-header">
+    <div class="container">
+      <div class="dashboard-header-inner">
+        <div class="dashboard-greeting">
+          <div class="user-avatar" id="headerAvatar">?</div>
+          <div>
+            <h1>Good <span id="timeGreeting">evening</span>, <span id="userName">Traveler</span> ✦</h1>
+            <p>Here's your travel command center</p>
+          </div>
+        </div>
+        <div class="dashboard-header-actions">
+          <a href="/explore" class="btn btn-ghost btn-sm">🌍 Explore</a>
+          <a href="/planner" class="btn btn-primary">✦ &nbsp;Plan New Trip</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- Stats Row -->
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card">
+        <span class="stat-card-icon">✈️</span>
+        <div class="stat-card-value" id="statTrips">0</div>
+        <div class="stat-card-label">Trips Planned</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-icon">📍</span>
+        <div class="stat-card-value" id="statDests">0</div>
+        <div class="stat-card-label">Destinations</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-icon">🌙</span>
+        <div class="stat-card-value" id="statDays">0</div>
+        <div class="stat-card-label">Days Planned</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-card-icon">💰</span>
+        <div class="stat-card-value" id="statBudget">$0</div>
+        <div class="stat-card-label">Total Budget</div>
+      </div>
+    </div>
+
+    <!-- Main Layout -->
+    <div class="dashboard-layout">
+
+      <!-- Saved Itineraries -->
+      <div>
+        <div class="section-title">
+          <span>🗂️ &nbsp;Saved Itineraries</span>
+          <a href="/planner" class="btn btn-outline btn-sm">+ New Trip</a>
+        </div>
+        <div class="itinerary-grid" id="itineraryGrid">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div>
+        <!-- Profile Card -->
+        <div class="profile-card">
+          <div class="profile-avatar-lg" id="profileAvatar">?</div>
+          <div class="profile-name" id="profileName">—</div>
+          <div class="profile-username" id="profileUsername">—</div>
+          <div class="profile-email" id="profileEmail">—</div>
+          <div class="profile-joined" id="profileJoined">Member since —</div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <h4>Quick Actions</h4>
+          <a href="/planner" class="quick-action-btn">
+            <span class="quick-action-icon">✦</span> Plan New Trip
+          </a>
+          <a href="/explore" class="quick-action-btn">
+            <span class="quick-action-icon">🌍</span> Explore Destinations
+          </a>
+          <a href="/itinerary" class="quick-action-btn">
+            <span class="quick-action-icon">🗺️</span> View Last Itinerary
+          </a>
+          <button class="quick-action-btn" onclick="logout()" style="border:none; text-align:left;">
+            <span class="quick-action-icon">🚪</span> Sign Out
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<script src="/js/main.js"></script>
+<script src="/js/auth.js"></script>
+<script src="/js/dashboard.js"></script>
+</body>
+</html>
