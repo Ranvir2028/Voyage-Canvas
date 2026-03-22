@@ -1,37 +1,37 @@
 # ============================================================
-#   database.py — SQLite Database Setup & Queries
+#   database.py — PostgreSQL (Supabase) Database Setup
+#   REPLACES the SQLite version for cloud deployment
 # ============================================================
 
-import sqlite3
 import os
 import hashlib
 import secrets
-from datetime import datetime
+import psycopg2
+from psycopg2.extras import RealDictCursor
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'voyage_canvas.db')
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 
 def get_db():
-    """Get a database connection."""
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    """Get a PostgreSQL database connection."""
+    conn = psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
     return conn
 
 
 def init_db():
-    """Initialize all database tables."""
+    """Initialize all database tables on Supabase PostgreSQL."""
     conn = get_db()
     c = conn.cursor()
 
     # Users table
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            username    TEXT UNIQUE NOT NULL,
-            email       TEXT UNIQUE NOT NULL,
-            password    TEXT NOT NULL,
-            full_name   TEXT NOT NULL,
-            created_at  TEXT DEFAULT CURRENT_TIMESTAMP,
+            id           SERIAL PRIMARY KEY,
+            username     TEXT UNIQUE NOT NULL,
+            email        TEXT UNIQUE NOT NULL,
+            password     TEXT NOT NULL,
+            full_name    TEXT NOT NULL,
+            created_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             avatar_color TEXT DEFAULT '#c9a84c'
         )
     ''')
@@ -39,32 +39,32 @@ def init_db():
     # Sessions table
     c.execute('''
         CREATE TABLE IF NOT EXISTS sessions (
-            token       TEXT PRIMARY KEY,
-            user_id     INTEGER NOT NULL,
-            created_at  TEXT DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id)
+            token      TEXT PRIMARY KEY,
+            user_id    INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )
     ''')
 
     # Saved itineraries table
     c.execute('''
         CREATE TABLE IF NOT EXISTS itineraries (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id      INTEGER NOT NULL,
-            title        TEXT NOT NULL,
-            destination  TEXT NOT NULL,
-            duration     INTEGER NOT NULL,
-            budget       REAL NOT NULL,
-            currency     TEXT DEFAULT 'USD',
-            data         TEXT NOT NULL,
-            created_at   TEXT DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id)
+            id          SERIAL PRIMARY KEY,
+            user_id     INTEGER NOT NULL,
+            title       TEXT NOT NULL,
+            destination TEXT NOT NULL,
+            duration    INTEGER NOT NULL,
+            budget      REAL NOT NULL,
+            currency    TEXT DEFAULT 'USD',
+            data        TEXT NOT NULL,
+            created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
         )
     ''')
 
     conn.commit()
     conn.close()
-    print("   Database initialized ✓")
+    print("   Database initialized on Supabase PostgreSQL ✓")
 
 
 def hash_password(password: str) -> str:
@@ -75,19 +75,23 @@ def hash_password(password: str) -> str:
 def create_user(username: str, email: str, password: str, full_name: str) -> dict:
     conn = get_db()
     try:
-        conn.execute(
-            'INSERT INTO users (username, email, password, full_name) VALUES (?, ?, ?, ?)',
+        c = conn.cursor()
+        c.execute(
+            'INSERT INTO users (username, email, password, full_name) VALUES (%s, %s, %s, %s)',
             (username.lower(), email.lower(), hash_password(password), full_name)
         )
         conn.commit()
-        user = conn.execute(
-            'SELECT * FROM users WHERE username = ?', (username.lower(),)
-        ).fetchone()
+        c.execute('SELECT * FROM users WHERE username = %s', (username.lower(),))
+        user = c.fetchone()
         return {"success": True, "user": dict(user)}
-    except sqlite3.IntegrityError as e:
+    except psycopg2.errors.UniqueViolation as e:
+        conn.rollback()
         if "username" in str(e):
             return {"success": False, "error": "Username already taken"}
         return {"success": False, "error": "Email already registered"}
+    except Exception as e:
+        conn.rollback()
+        return {"success": False, "error": str(e)}
     finally:
         conn.close()
 
@@ -95,16 +99,17 @@ def create_user(username: str, email: str, password: str, full_name: str) -> dic
 def login_user(username_or_email: str, password: str) -> dict:
     conn = get_db()
     try:
-        user = conn.execute(
-            'SELECT * FROM users WHERE (username = ? OR email = ?) AND password = ?',
+        c = conn.cursor()
+        c.execute(
+            'SELECT * FROM users WHERE (username = %s OR email = %s) AND password = %s',
             (username_or_email.lower(), username_or_email.lower(), hash_password(password))
-        ).fetchone()
+        )
+        user = c.fetchone()
         if not user:
             return {"success": False, "error": "Invalid username or password"}
-        # Create session token
         token = secrets.token_hex(32)
-        conn.execute(
-            'INSERT INTO sessions (token, user_id) VALUES (?, ?)',
+        c.execute(
+            'INSERT INTO sessions (token, user_id) VALUES (%s, %s)',
             (token, user["id"])
         )
         conn.commit()
@@ -113,14 +118,16 @@ def login_user(username_or_email: str, password: str) -> dict:
         conn.close()
 
 
-def get_user_by_token(token: str) -> dict | None:
+def get_user_by_token(token: str):
     conn = get_db()
     try:
-        row = conn.execute('''
+        c = conn.cursor()
+        c.execute('''
             SELECT u.* FROM users u
             JOIN sessions s ON s.user_id = u.id
-            WHERE s.token = ?
-        ''', (token,)).fetchone()
+            WHERE s.token = %s
+        ''', (token,))
+        row = c.fetchone()
         return dict(row) if row else None
     finally:
         conn.close()
@@ -128,22 +135,27 @@ def get_user_by_token(token: str) -> dict | None:
 
 def logout_user(token: str):
     conn = get_db()
-    conn.execute('DELETE FROM sessions WHERE token = ?', (token,))
-    conn.commit()
-    conn.close()
+    try:
+        c = conn.cursor()
+        c.execute('DELETE FROM sessions WHERE token = %s', (token,))
+        conn.commit()
+    finally:
+        conn.close()
 
 
 def save_itinerary(user_id: int, title: str, destination: str,
                    duration: int, budget: float, currency: str, data: str) -> dict:
     conn = get_db()
     try:
-        conn.execute('''
+        c = conn.cursor()
+        c.execute('''
             INSERT INTO itineraries (user_id, title, destination, duration, budget, currency, data)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
         ''', (user_id, title, destination, duration, budget, currency, data))
         conn.commit()
         return {"success": True}
     except Exception as e:
+        conn.rollback()
         return {"success": False, "error": str(e)}
     finally:
         conn.close()
@@ -152,23 +164,26 @@ def save_itinerary(user_id: int, title: str, destination: str,
 def get_user_itineraries(user_id: int) -> list:
     conn = get_db()
     try:
-        rows = conn.execute('''
+        c = conn.cursor()
+        c.execute('''
             SELECT id, title, destination, duration, budget, currency, created_at
-            FROM itineraries WHERE user_id = ?
+            FROM itineraries WHERE user_id = %s
             ORDER BY created_at DESC
-        ''', (user_id,)).fetchall()
-        return [dict(r) for r in rows]
+        ''', (user_id,))
+        return [dict(r) for r in c.fetchall()]
     finally:
         conn.close()
 
 
-def get_itinerary_by_id(itin_id: int, user_id: int) -> dict | None:
+def get_itinerary_by_id(itin_id: int, user_id: int):
     conn = get_db()
     try:
-        row = conn.execute(
-            'SELECT * FROM itineraries WHERE id = ? AND user_id = ?',
+        c = conn.cursor()
+        c.execute(
+            'SELECT * FROM itineraries WHERE id = %s AND user_id = %s',
             (itin_id, user_id)
-        ).fetchone()
+        )
+        row = c.fetchone()
         return dict(row) if row else None
     finally:
         conn.close()
@@ -177,8 +192,9 @@ def get_itinerary_by_id(itin_id: int, user_id: int) -> dict | None:
 def delete_itinerary(itin_id: int, user_id: int) -> dict:
     conn = get_db()
     try:
-        conn.execute(
-            'DELETE FROM itineraries WHERE id = ? AND user_id = ?',
+        c = conn.cursor()
+        c.execute(
+            'DELETE FROM itineraries WHERE id = %s AND user_id = %s',
             (itin_id, user_id)
         )
         conn.commit()
@@ -190,20 +206,22 @@ def delete_itinerary(itin_id: int, user_id: int) -> dict:
 def get_user_stats(user_id: int) -> dict:
     conn = get_db()
     try:
-        rows = conn.execute(
-            'SELECT destination, budget, currency, duration FROM itineraries WHERE user_id = ?',
+        c = conn.cursor()
+        c.execute(
+            'SELECT destination, budget, currency, duration FROM itineraries WHERE user_id = %s',
             (user_id,)
-        ).fetchall()
-        total_trips = len(rows)
+        )
+        rows = c.fetchall()
+        total_trips  = len(rows)
         destinations = list(set(r["destination"] for r in rows))
         total_budget = sum(r["budget"] for r in rows)
         total_days   = sum(r["duration"] for r in rows)
         return {
-            "totalTrips": total_trips,
-            "uniqueDestinations": len(destinations),
-            "totalBudgetSpent": round(total_budget, 2),
-            "totalDaysPlanned": total_days,
-            "topDestinations": destinations[:3]
+            "totalTrips":          total_trips,
+            "uniqueDestinations":  len(destinations),
+            "totalBudgetSpent":    round(total_budget, 2),
+            "totalDaysPlanned":    total_days,
+            "topDestinations":     destinations[:3]
         }
     finally:
         conn.close()
