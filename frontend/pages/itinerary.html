@@ -33,7 +33,7 @@
 </div>
 
 <!-- Itinerary Content (shown when data exists) -->
-<main class="itinerary-page page-enter" id="itineraryContent" style="display:none;">
+<main class="itinerary-page page-enter" id="itineraryContent">
 
   <!-- Trip Banner -->
   <div class="trip-banner">
@@ -41,19 +41,19 @@
       <div class="trip-banner-inner">
         <div class="trip-title-block">
           <span class="label" id="itinLabel">Your Personalized Journey</span>
-          <h1 id="itinTitle">Loading...</h1>
+          <h1 id="tripTitle">Loading...</h1>
           <div class="trip-meta">
             <div class="trip-meta-item">
-              <span>📍</span> <span id="itinDestination">—</span>
+              <span>📍</span> <span id="bannerDestination">—</span>
             </div>
             <div class="trip-meta-item">
               <span>📅</span> <span id="itinDates">—</span>
             </div>
             <div class="trip-meta-item">
-              <span>⏱️</span> <span id="itinDuration">—</span>
+              <span>⏱️</span> <span id="bannerDays">—</span>
             </div>
             <div class="trip-meta-item">
-              <span>💰</span> <span id="itinBudget">—</span>
+              <span>💰</span> <span id="bannerBudget">—</span>
             </div>
           </div>
         </div>
@@ -89,7 +89,7 @@
         <!-- Day Navigator -->
         <div class="sidebar-card">
           <h4>🗓️ Days</h4>
-          <ul class="day-nav-list" id="dayNavList">
+          <ul class="day-nav-list" id="dayNav">
             <!-- Filled by JS -->
           </ul>
         </div>
@@ -132,7 +132,7 @@
         <!-- Packing List -->
         <div class="sidebar-card">
           <h4>🧳 Packing List</h4>
-          <div class="packing-grid" id="packingGrid">
+          <div class="packing-grid" id="packingList">
             <!-- Filled by JS -->
           </div>
         </div>
@@ -146,10 +146,10 @@
         <div class="overview-card" id="overviewCard">
           <div class="overview-text">
             <span class="label" style="margin-bottom:0.8rem; display:block;">Trip Overview</span>
-            <p id="overviewText"></p>
+            <p id="tripSummary"></p>
             <p style="font-size:0.82rem; color:var(--muted);">
               <strong style="color:var(--gold);">Best Time to Visit:</strong>
-              <span id="bestTime"></span>
+              <span id="bestTimeToVisit"></span>
             </p>
           </div>
           <div>
@@ -169,6 +169,17 @@
 
 <script src="/js/auth.js"></script>
 <script src="/js/main.js"></script>
+<script>
+  // Show correct section based on localStorage
+  const _itin = localStorage.getItem('vc_itinerary');
+  if (!_itin) {
+    document.getElementById('noItineraryState').style.display = 'flex';
+    document.getElementById('itineraryContent').style.display = 'none';
+  } else {
+    document.getElementById('noItineraryState').style.display = 'none';
+    document.getElementById('itineraryContent').style.display = 'block';
+  }
+</script>
 <script src="/js/itinerary.js"></script>
 <script>requireAuth();</script>
 </body>

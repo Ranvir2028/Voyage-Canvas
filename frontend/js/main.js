@@ -2,18 +2,18 @@
 //   VOYAGE CANVAS — Main JS (Global)
 // =====================================================
 
-const API_BASE = "http://localhost:5000";
+// Auto-detect base URL so it works on localhost AND Railway
+const API_BASE = window.location.origin;
 
-// ── Toast Notifications ──────────────────────────────
+// ── Toast Notifications ───────────────────────────────
 function showToast(message, type = "info", duration = 3500) {
   const existing = document.querySelector(".toast");
   if (existing) existing.remove();
-
   const toast = document.createElement("div");
   toast.className = `toast ${type}`;
   const icons = { success: "✓", error: "✕", info: "✦" };
   toast.innerHTML = `
-    <span style="color: ${type === "success" ? "#4ade80" : type === "error" ? "#f87171" : "var(--gold)"}">
+    <span style="color:${type === "success" ? "#4ade80" : type === "error" ? "#f87171" : "var(--gold)"}">
       ${icons[type] || "✦"}
     </span>
     <span>${message}</span>
@@ -26,7 +26,7 @@ function showToast(message, type = "info", duration = 3500) {
   }, duration);
 }
 
-// ── Loading Overlay ──────────────────────────────────
+// ── Loading Overlay ───────────────────────────────────
 function showLoading(text = "Loading...", subtext = "") {
   const overlay = document.getElementById("loadingOverlay");
   if (!overlay) return;
@@ -42,20 +42,19 @@ function hideLoading() {
   if (overlay) overlay.classList.remove("active");
 }
 
-// ── API Helper ───────────────────────────────────────
+// ── API Helper — always sends auth token ──────────────
 async function apiCall(endpoint, method = "GET", body = null) {
-  const options = {
-    method,
-    headers: { "Content-Type": "application/json" },
-  };
+  const token = localStorage.getItem("vc_token");
+  const headers = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const options = { method, headers };
   if (body) options.body = JSON.stringify(body);
 
   try {
     const response = await fetch(`${API_BASE}${endpoint}`, options);
     const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.error || `HTTP ${response.status}`);
-    }
+    if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
     return data;
   } catch (err) {
     console.error(`API Error [${endpoint}]:`, err);
@@ -63,20 +62,23 @@ async function apiCall(endpoint, method = "GET", body = null) {
   }
 }
 
-// ── Date Utilities ───────────────────────────────────
+// ── Date Utilities ────────────────────────────────────
 function formatDate(dateStr) {
   if (!dateStr) return "—";
-  const d = new Date(dateStr);
-  return d.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  try {
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  } catch {
+    return dateStr;
+  }
 }
 
 function daysBetween(start, end) {
-  const s = new Date(start);
-  const e = new Date(end);
+  const s = new Date(start),
+    e = new Date(end);
   return Math.max(1, Math.round((e - s) / (1000 * 60 * 60 * 24)));
 }
 
@@ -86,7 +88,7 @@ function formatCurrency(amount, currency = "USD") {
   return `${sym}${Number(amount).toLocaleString()}`;
 }
 
-// ── LocalStorage Trip Data ────────────────────────────
+// ── LocalStorage Helpers ──────────────────────────────
 function saveTripData(data) {
   localStorage.setItem("vc_trip_data", JSON.stringify(data));
 }
@@ -113,7 +115,7 @@ function loadItinerary() {
   }
 }
 
-// ── Animate on scroll ────────────────────────────────
+// ── Animate on scroll ─────────────────────────────────
 document.addEventListener("DOMContentLoaded", () => {
   const cards = document.querySelectorAll(".step-card, .feature-card, .card");
   const obs = new IntersectionObserver(

@@ -43,7 +43,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 // ── Stats ─────────────────────────────────────────────
 async function loadStats(token) {
   try {
-    const res = await fetch("/api/user/stats", { headers: authHeaders() });
+    const res = await fetch(`${window.location.origin}/api/user/stats`, {
+      headers: authHeaders(),
+    });
     const data = await res.json();
     if (!data.success) return;
     const s = data.stats;
@@ -74,7 +76,7 @@ function animateCount(id, target) {
 async function loadItineraries(token) {
   const grid = document.getElementById("itineraryGrid");
   try {
-    const res = await fetch("/api/user/itineraries", {
+    const res = await fetch(`${window.location.origin}/api/user/itineraries`, {
       headers: authHeaders(),
     });
     const data = await res.json();
@@ -127,25 +129,35 @@ async function loadItineraries(token) {
 
 async function loadItinerary(id) {
   try {
-    const res = await fetch(`/api/user/itineraries/${id}`, {
-      headers: authHeaders(),
-    });
+    const res = await fetch(
+      `${window.location.origin}/api/user/itineraries/${id}`,
+      { headers: authHeaders() },
+    );
     const data = await res.json();
     if (data.success) {
       const itin = JSON.parse(data.itinerary.data);
+
+      // Save itinerary data
       localStorage.setItem("vc_itinerary", JSON.stringify(itin));
-      localStorage.setItem(
-        "vc_trip_data",
-        JSON.stringify({
-          destination: data.itinerary.destination,
-          duration: data.itinerary.duration,
-          budget: data.itinerary.budget,
-          currency: data.itinerary.currency,
-        }),
-      );
+
+      // Save trip data with ALL fields itinerary.js needs
+      const tripData = {
+        destination: data.itinerary.destination,
+        days: data.itinerary.duration,
+        duration: data.itinerary.duration,
+        budget: data.itinerary.budget,
+        currency: data.itinerary.currency,
+        groupType: itin.groupType || "Solo",
+        interests: itin.interests || [],
+      };
+      localStorage.setItem("vc_trip_data", JSON.stringify(tripData));
+
       window.location.href = "/itinerary";
+    } else {
+      showToast("Could not load itinerary", "error");
     }
   } catch (e) {
+    console.error("Load itinerary error:", e);
     showToast("Could not load itinerary", "error");
   }
 }
@@ -153,10 +165,13 @@ async function loadItinerary(id) {
 async function deleteItinerary(id) {
   if (!confirm("Delete this itinerary? This cannot be undone.")) return;
   try {
-    const res = await fetch(`/api/user/itineraries/${id}`, {
-      method: "DELETE",
-      headers: authHeaders(),
-    });
+    const res = await fetch(
+      `${window.location.origin}/api/user/itineraries/${id}`,
+      {
+        method: "DELETE",
+        headers: authHeaders(),
+      },
+    );
     const data = await res.json();
     if (data.success) {
       document.getElementById(`itin-${id}`)?.remove();

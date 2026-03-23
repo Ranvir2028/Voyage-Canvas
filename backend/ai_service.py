@@ -5,21 +5,19 @@
 import json, re, requests, time
 import settings
 
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
+OPENROUTER_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 FALLBACK_MODELS = [
-    "google/gemma-3-27b-it:free",
-    "meta-llama/llama-3.1-8b-instruct:free",
-    "qwen/qwen3-8b:free",
-    "mistralai/mistral-7b-instruct:free",
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
+    "mixtral-8x7b-32768",
+    "gemma2-9b-it",
 ]
 
 def _get_headers():
     return {
         "Authorization": f"Bearer {settings.GEMINI_API_KEY}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "http://localhost:5000",
-        "X-Title": "Voyage Canvas"
+        "Content-Type": "application/json"
     }
 
 def _call_ai(prompt: str) -> str:

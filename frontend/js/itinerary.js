@@ -4,16 +4,30 @@
 
 document.addEventListener("DOMContentLoaded", () => {
   const itinerary = loadItinerary();
-  const tripData = loadTripData();
+  let tripData = loadTripData();
 
-  if (!itinerary || !tripData) {
+  if (!itinerary) {
     document.body.innerHTML = `
       <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2rem;background:var(--midnight);color:var(--cream);">
         <div style="font-size:4rem;">🗺️</div>
-        <h2 style="font-family:var(--font-display);">No itinerary found</h2>
-        <a href="/planner" class="btn btn-primary">Plan a Trip</a>
+        <h2 style="font-family:var(--font-display);">No Itinerary Yet</h2>
+        <p style="color:var(--muted);margin-bottom:1rem;">You haven't generated an itinerary yet.</p>
+        <a href="/planner" class="btn btn-primary">✦ &nbsp;Start Planning</a>
       </div>`;
     return;
+  }
+
+  // Build tripData from itinerary if missing
+  if (!tripData) {
+    tripData = {
+      destination: itinerary.destination || "—",
+      days: itinerary.totalDays || itinerary.days?.length || 3,
+      duration: itinerary.totalDays || itinerary.days?.length || 3,
+      budget: itinerary.totalBudget || 0,
+      currency: itinerary.currency || "USD",
+      groupType: itinerary.groupType || "Solo",
+    };
+    localStorage.setItem("vc_trip_data", JSON.stringify(tripData));
   }
 
   renderBanner(itinerary, tripData);

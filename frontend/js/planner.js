@@ -259,14 +259,16 @@ async function generateItinerary() {
 
   const tripData = {
     destination: dest,
-    start_date: start,
-    end_date: end,
-    duration: days,
-    budget,
+    startDate: start,
+    endDate: end,
+    days: days, // backend reads 'days'
+    duration: days, // keep both for compatibility
+    budget: budget,
     currency: selectedCurrency,
     interests: selectedInterests,
-    group_type: selectedGroup,
-    travelers,
+    groupType: selectedGroup, // backend reads 'groupType'
+    group_type: selectedGroup, // keep both for compatibility
+    travelers: travelers,
     accommodation: accom,
   };
 
