@@ -758,3 +758,165 @@
 }
 
 .attraction-must { color: var(--gold); }
+
+/* =====================================================
+   ITINERARY JS — Generated class fixes
+   Matches the actual class names from itinerary.js
+   ===================================================== */
+
+/* ── Day Card ── */
+.day-card {
+  background: var(--navy);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  margin-bottom: 2rem;
+  transition: var(--transition);
+}
+
+.day-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 1.8rem 2.5rem;
+  background: linear-gradient(90deg, var(--navy-light), var(--navy));
+  border-bottom: 1px solid var(--border);
+  gap: 1rem;
+}
+
+.day-number {
+  display: inline-block;
+  background: var(--gold);
+  color: var(--midnight);
+  font-family: var(--font-stamp);
+  font-size: 0.85rem;
+  letter-spacing: 2px;
+  padding: 0.3rem 0.9rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.6rem;
+}
+
+.day-theme {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--cream);
+  margin-bottom: 0.3rem;
+}
+
+/* ── Timeline ── */
+.day-timeline {
+  padding: 2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.timeline-slot {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 0 1.5rem;
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+.timeline-slot:last-child {
+  padding-bottom: 0.5rem;
+}
+
+.timeline-slot:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 21px;
+  top: 44px;
+  bottom: 0;
+  width: 1px;
+  background: var(--border);
+}
+
+.timeline-dot {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--navy-light);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-content {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.2rem 1.5rem;
+  transition: var(--transition);
+}
+
+.timeline-content:hover {
+  border-color: rgba(201,168,76,0.3);
+  background: var(--glass-hover);
+}
+
+.timeline-time {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.4rem;
+}
+
+.timeline-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--cream);
+  margin-bottom: 0.5rem;
+}
+
+.timeline-desc {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* ── Accommodation Row ── */
+.day-accommodation {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem 2.5rem;
+  border-top: 1px solid var(--border);
+  background: rgba(201,168,76,0.02);
+}
+
+/* ── Day Nav Buttons (JS generates day-nav-btn) ── */
+.day-nav-btn {
+  display: block;
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid transparent;
+  font-size: 0.85rem;
+  color: var(--muted);
+  background: transparent;
+  text-align: left;
+  font-family: var(--font-body);
+}
+
+.day-nav-btn:hover {
+  background: var(--glass);
+  color: var(--cream);
+}
+
+.day-nav-btn.active {
+  background: rgba(201,168,76,0.1);
+  border-color: rgba(201,168,76,0.3);
+  color: var(--gold);
+}
