@@ -35,4 +35,4 @@ FLASK_PORT  = int(os.getenv('PORT', 5000))       # Render injects $PORT automati
 FLASK_DEBUG = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'  # Off in production
 
 # ── AI Model ─────────────────────────────────────────────────
-GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'google/gemma-3-27b-it:free')
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'meta-llama/llama-3.2-1b-instruct:free')
