@@ -39,6 +39,7 @@ Make and open `backend/.env` and paste your keys:
 - Create project at [supabase.com](https://supabase.com)
 - Go to Project Settings → Database → Connection string → copy `DATABASE_URL`
 - Go to Project Settings → API → copy `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`
+- NOTE:- Optional — `SUPABASE_URL` is for future Supabase REST calls, & `SUPABASE_SERVICE_KEY` is a Service role key (bypasses RLS)
 
 #### `.env` Example
 ```env
