@@ -1,5 +1,17 @@
 # 🌍 Voyage Canvas — Design Your Journey
-> AI-Powered Personalized Travel Itinerary Generator
+> AI-powered travel planning that builds you a full day-by-day itinerary in seconds.
+> Powered by **Vision AI (via Grok)**.
+
+---
+
+## 🚀 Quick Start
+
+```bash
+git clone <your-repo>
+cd voyage-canvas/backend
+pip install -r requirements.txt
+python app.py
+```
 
 ---
 
@@ -13,11 +25,28 @@
 
 ### Step 1 — Add Your API Keys
 
-Open `backend/.env` and paste your keys:
+Make and open `backend/.env` and paste your keys:
 
-```python
-GEMINI_API_KEY  = "your_gemini_key_here"      # https://aistudio.google.com/
-WEATHER_API_KEY = "your_openweather_key_here"  # https://openweathermap.org/api (free)
+#### 1. Vision AI (Groq)
+- Go to [console.groq.com](https://console.groq.com)
+- Create API key → paste as `VISION_KEY`
+
+### 2. OpenWeatherMap
+- Sign up at [openweathermap.org](https://openweathermap.org/api)
+- Copy key → paste as `OPENWEATHER_API_KEY`
+
+#### 3. Supabase (Database)
+- Create project at [supabase.com](https://supabase.com)
+- Go to Project Settings → Database → Connection string → copy `DATABASE_URL`
+- Go to Project Settings → API → copy `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`
+
+#### `.env` Example
+```env
+VISION_KEY=gsk_xxxxx
+OPENWEATHER_API_KEY=abc123
+DATABASE_URL=postgresql://...
+SUPABASE_URL=https://xxxxx.supabase.co
+SUPABASE_SERVICE_KEY=eyJhbGci...
 ```
 
 ---
@@ -52,74 +81,70 @@ Visit: **http://localhost:5000**
 
 ---
 
+Here is the content formatted as a proper table:
+
+| Feature | Description |
+| :--- | :--- |
+| 🧠 Vision AI | Generates complete day-by-day itineraries with activity costs, locations, and insider tips |
+| 🌤️ Live Weather | Real-time weather + 5-day forecast |
+| 💰 Smart Budgeting | Auto-splits budget across categories |
+| 🗺️ Maps | Embedded Google Maps |
+| 🌍 Explore | 12+ curated destinations + AI search |
+| 📄 Export | PDF / Print |
+| 💱 Dual Currency | USD / INR with local currency detection |
+
+---
+
 ## 📁 Project Structure
 
 ```
 voyage-canvas/
 ├── backend/
 │   ├── app.py              ← Flask server & all API routes
-│   ├── ai_service.py       ← Gemini AI itinerary generation
+│   ├── ai_service.py       ← AI itinerary generation
 │   ├── weather_service.py  ← OpenWeatherMap integration
 │   ├── budget_service.py   ← Budget allocation logic
-│   ├── .env                ← Environment variables
+│   ├── currency_service.py ← Local currency detection & conversion
 │   ├── settings.py         ← API keys & server config
-│   └── requirements.txt
+│   ├── database.py         ← PostgreSQL (Supabase) — users, sessions, itineraries
+│   ├── requirements.txt    ← Dependencies
+│   └── .env                ← Environment variables (gitignored)
 │
 ├── frontend/
+│   ├── assets/
+│   │    └── favicon.ico       ← logo
+│   │ 
 │   ├── pages/
 │   │   ├── index.html      ← Landing page
-│   │   ├── planner.html    ← Multi-step trip planner
+│   │   ├── login.html     # Auth page — sign in / register
+│   │   ├── planner.html    ← 4-step trip planner
 │   │   ├── itinerary.html  ← Generated itinerary dashboard
-│   │   └── explore.html    ← Destination explorer
+│   │   ├── explore.html    ← Destination explorer
+│   │   └── dashboard.html # User profile & saved trips
 │   │
 │   ├── css/
 │   │   ├── global.css      ← Fonts, variables, shared styles
+│   │   ├── auth.css       # Login & dashboard styles
 │   │   ├── landing.css     ← Landing page styles
 │   │   ├── planner.css     ← Form & planner styles
 │   │   └── itinerary.css   ← Dashboard & explore styles
 │   │
 │   └── js/
 │       ├── main.js         ← Global utilities, API helper, toast
+│       ├── auth.js        # Login, register, logout, auth guard
 │       ├── planner.js      ← Form logic, step navigation, validation
 │       ├── itinerary.js    ← Dashboard render, weather, budget
-│       └── explore.js      ← Destination cards, modal, AI search
+│       ├── explore.js      ← Destination cards, modal, AI search
+│       └── dashboard.js   # Stats, saved itineraries, profile
 │
-├── README.md               ← Project overview, setup, usage instructions
+├── render.yaml             # Render.com deployment config
+│
+├── runtime.txt             # Python version (3.12)
 │
 ├── .gitignore              ← Files to ignore during version control
 │
-└── START_WINDOWS.bat       ← Windows batch script to run the application
+└──  README.md               ← Project overview, setup, usage instructions
 ```
-
----
-
-## ✨ Features
-
-| Feature | Description |
-|---|---|
-| 🤖 AI Itinerary | Gemini generates full day-by-day plans |
-| 🌤️ Live Weather | Real-time weather at your destination |
-| 💰 Budget Smart | Category-based budget allocation |
-| 🗺️ Maps | Google Maps embedded for every destination |
-| 🌍 Explore | Browse 9+ curated destinations + AI search any city |
-| 📄 Export | Print/PDF export of your itinerary |
-| 💱 Dual Currency | Switch between USD ($) and INR (₹) |
-
----
-
-## 🔑 Getting API Keys (Free)
-
-**Gemini API Key:**
-1. Go to https://aistudio.google.com/
-2. Sign in with Google
-3. Click "Get API Key"
-4. Copy and paste into `backend/.env`
-
-**OpenWeatherMap API Key:**
-1. Go to https://openweathermap.org/api
-2. Sign up (free)
-3. Go to "My API Keys"
-4. Copy and paste into `backend/.env`
 
 ---
 
@@ -132,45 +157,3 @@ voyage-canvas/
 5. **Explore** → Browse popular destinations or search any city
 
 ---
-
-Built with Flask · Google Gemini AI · OpenWeatherMap · Vanilla JS
-
-
-voyage-canvas/
-├── backend/
-│   ├── app.py                  ← REPLACE ♻️
-│   ├── ai_service.py           ← keep ✅
-│   ├── weather_service.py      ← keep ✅
-│   ├── budget_service.py       ← keep ✅
-│   ├── database.py             ← keep ✅
-│   ├── currency_service.py     ← NEW 🆕
-│   ├── settings.py             ← keep ✅
-│   └── requirements.txt        ← keep ✅
-│
-├── frontend/
-│   ├── pages/
-│   │   ├── login.html          ← keep ✅
-│   │   ├── dashboard.html      ← keep ✅
-│   │   ├── index.html          ← keep ✅
-│   │   ├── planner.html        ← REPLACE ♻️
-│   │   ├── itinerary.html      ← REPLACE ♻️
-│   │   └── explore.html        ← keep ✅
-│   │
-│   ├── css/
-│   │   ├── auth.css            ← keep ✅
-│   │   ├── global.css          ← keep ✅
-│   │   ├── landing.css         ← keep ✅
-│   │   ├── planner.css         ← REPLACE ♻️
-│   │   └── itinerary.css       ← keep ✅
-│   │
-│   └── js/
-│       ├── auth.js             ← keep ✅
-│       ├── dashboard.js        ← keep ✅
-│       ├── main.js             ← keep ✅
-│       ├── planner.js          ← REPLACE ♻️
-│       ├── itinerary.js        ← REPLACE ♻️
-│       └── explore.js          ← keep ✅
-│
-├── README.md                   ← keep ✅
-├── .gitignore                  ← keep ✅
-└── START_WINDOWS.bat           ← keep ✅

@@ -1,6 +1,5 @@
 # ============================================================
 #   settings.py — Voyage Canvas Configuration
-#   Production-ready version for Render deployment
 # ============================================================
 
 import os
@@ -9,8 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ── API Keys ──────────────────────────────────────────────────
-# NOTE: GEMINI_API_KEY is actually your OpenRouter key
-GEMINI_API_KEY      = os.getenv('GEMINI_API_KEY')
+# NOTE: VISION_KEY is your Groq API key
+VISION_API_KEY      = os.getenv('VISION_KEY')
 OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
 
 # ── Supabase (DBaaS) ──────────────────────────────────────────
@@ -19,8 +18,8 @@ SUPABASE_URL    = os.getenv('SUPABASE_URL')
 SUPABASE_KEY    = os.getenv('SUPABASE_SERVICE_KEY')
 
 # ── Validation ────────────────────────────────────────────────
-if not GEMINI_API_KEY:
-    raise ValueError("GEMINI_API_KEY not found in environment variables")
+if not VISION_API_KEY:
+    raise ValueError("VISION_API_KEY not found in environment variables")
 
 if not OPENWEATHER_API_KEY:
     raise ValueError("OPENWEATHER_API_KEY not found in environment variables")
@@ -35,4 +34,4 @@ FLASK_PORT  = int(os.getenv('PORT', 5000))       # Render injects $PORT automati
 FLASK_DEBUG = os.getenv('FLASK_DEBUG', 'false').lower() == 'true'  # Off in production
 
 # ── AI Model ─────────────────────────────────────────────────
-GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'llama-3.3-70b-versatile')
+VISION_MODEL = os.getenv('VISION_MODEL', 'llama-3.3-70b-versatile')

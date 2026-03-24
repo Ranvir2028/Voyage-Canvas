@@ -287,7 +287,7 @@ async function generateItinerary() {
     "✦  Almost ready — this will be epic...",
   ];
 
-  showLoading(loadingMessages[0], "Powered by Google Gemini AI");
+  showLoading(loadingMessages[0], "Powered by Vision AI");
 
   let msgIdx = 0;
   const msgTimer = setInterval(() => {

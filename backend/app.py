@@ -286,5 +286,5 @@ def currency_list():
 if __name__ == "__main__":
     print("\n🌍 Voyage Canvas is LIVE")
     print(f"   Open: http://127.0.0.1:{settings.FLASK_PORT}")
-    print(f"   Gemini: {settings.GEMINI_MODEL}\n")
+    print(f"   Vision AI: {settings.VISION_MODEL}\n")
     app.run(host=settings.FLASK_HOST, port=settings.FLASK_PORT, debug=settings.FLASK_DEBUG)

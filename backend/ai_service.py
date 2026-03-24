@@ -1,11 +1,12 @@
 # ============================================================
-#   ai_service.py — OpenRouter AI with Retry & Fallback
+#   ai_service.py — Vision AI with Retry & Fallback
 # ============================================================
 
 import json, re, requests, time
 import settings
 
-OPENROUTER_URL = "https://api.groq.com/openai/v1/chat/completions"
+# Vision AI endpoint (Groq)
+VISION_URL = "https://api.groq.com/openai/v1/chat/completions"
 
 FALLBACK_MODELS = [
     "llama-3.3-70b-versatile",
@@ -16,12 +17,12 @@ FALLBACK_MODELS = [
 
 def _get_headers():
     return {
-        "Authorization": f"Bearer {settings.GEMINI_API_KEY}",
+        "Authorization": f"Bearer {settings.VISION_API_KEY}",
         "Content-Type": "application/json"
     }
 
 def _call_ai(prompt: str) -> str:
-    models = [settings.GEMINI_MODEL] + [m for m in FALLBACK_MODELS if m != settings.GEMINI_MODEL]
+    models = [settings.VISION_MODEL] + [m for m in FALLBACK_MODELS if m != settings.VISION_MODEL]
     last_error = None
     for model in models:
         for attempt in range(2):
@@ -33,7 +34,7 @@ def _call_ai(prompt: str) -> str:
                     "temperature": 0.7,
                     "max_tokens": 6000
                 }
-                response = requests.post(OPENROUTER_URL, headers=_get_headers(),
+                response = requests.post(VISION_URL, headers=_get_headers(),
                                          json=payload, timeout=90)
                 if response.status_code == 429:
                     wait = int(response.headers.get("Retry-After", 15))

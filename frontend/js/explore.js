@@ -194,7 +194,7 @@ async function searchDestination() {
   }
 
   // Fetch from AI
-  showLoading("Researching destination...", "Powered by Google Gemini");
+  showLoading("Researching destination...", "Powered by Vision AI");
   try {
     const result = await apiCall(
       `/api/destination-info?destination=${encodeURIComponent(query)}`,
